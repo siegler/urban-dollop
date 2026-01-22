@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>10-Minute Memory Test</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121b2e;
+      --text: #e9eefc;
+      --muted: #a9b4d6;
+      --accent: #5dd6c8;
+      --danger: #ff6b6b;
+      --ok: #65d38b;
+      --border: rgba(233, 238, 252, 0.12);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--sans);
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(93, 214, 200, 0.14), transparent 55%),
+                  radial-gradient(1000px 700px at 80% 0%, rgba(125, 164, 255, 0.16), transparent 50%),
+                  var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(920px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    header .sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .head-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(0,0,0,0.15);
+    }
+
+    .pill strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.06s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    button:hover { background: rgba(255,255,255,0.08); border-color: rgba(233,238,252,0.2); }
+    button:active { transform: translateY(1px); }
+    button.primary {
+      background: rgba(93, 214, 200, 0.18);
+      border-color: rgba(93, 214, 200, 0.35);
+    }
+    button.primary:hover { background: rgba(93, 214, 200, 0.24); }
+
+    main {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .words {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .word {
+      padding: 12px 10px;
+      text-align: center;
+      border-radius: 14px;
+      border: 1px dashed rgba(233, 238, 252, 0.25);
+      background: rgba(255,255,255,0.03);
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: lowercase;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .status {
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status .ok { color: var(--ok); }
+    .status .bad { color: var(--danger); }
+    .status .accent { color: var(--accent); }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      note: none;
+      color: var(--text);
+      padding: 12px 12px;
+      font-size: 14px;
+      line-height: 1.45;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: rgba(93, 214, 200, 0.45);
+      box-shadow: 0 0 0 3px rgba(93, 214, 200, 0.12);
+    }
+
+    .results {
+      display: grid;
+      gap: 10px;
+    }
+
+    .meter {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .bar {
+      height: 12px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(93,214,200,0.9), rgba(125,164,255,0.9));
+      transition: width 0.4s ease;
+    }
+
+    .score {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+    }
+
+    .chip.good { color: var(--text); border-color: rgba(101,211,139,0.35); background: rgba(101,211,139,0.08); }
+    .chip.good .dot { background: rgba(101,211,139,0.85); }
+
+    .chip.bad { color: var(--text); border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.07); }
+    .chip.bad .dot { background: rgba(255,107,107,0.85); }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 700px) {
+      .words { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .word:nth-child(5) { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header>
+      <div class="head-left">
+        <h1>10-Minute Memory Test</h1>
+        <div class="sub">Memorize 5 words now, recall them in 10 minutes.</div>
+      </div>
+
+      <div class="toolbar">
+        <div class="pill">Timer: <strong id="timerLabel">Not started</strong></div>
+        <button id="newWordsBtn">New words</button>
+        <button id="restartBtn">Restart</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card" id="stageMemorize">
+        <div class="title-row">
+          <h2>Step 1: Memorize these words</h2>
+          <div class="status" id="memorizeStatus">Press <span class="accent">Start</span> when ready.</div>
+        </div>
+
+        <p class="hint">
+          Take 20–30 seconds to memorize them. Say them to yourself once or twice.
+          When you’re ready, start the timer and do something else.
+        </p>
+
+        <div class="words" id="wordsGrid" aria-label="Word list"></div>
+
+        <div class="row">
+          <button class="primary" id="startBtn">Start 10-minute timer</button>
+          <div class="status" id="startHint">You’ll be asked to recall them when time is up.</div>
+        </div>
+
+        <div class="footer-note">
+          Tip: you can leave this tab open and come back later. The timer runs in the background.
+        </div>
+      </section>
+
+      <section class="card" id="stageRecall" style="display:none;">
+        <div class="title-row">
+          <h2>Step 2: Recall the words</h2>
+          <div class="status" id="recallStatus">
+            Enter the five words (any order). Separate by spaces or commas.
+          </div>
+        </div>
+
+        <textarea id="recallInput" placeholder="Type the words you remember..."></textarea>
+
+        <div class="row">
+          <button class="primary" id="scoreBtn">Score my recall</button>
+          <button id="revealBtn" title="Shows the original words (counts as peeking)">Reveal answers</button>
+          <div class="status" id="peekStatus"></div>
+        </div>
+      </section>
+
+      <section class="card" id="stageResults" style="display:none;">
+        <div class="title-row">
+          <h2>Results</h2>
+          <div class="status" id="resultStatus"></div>
+        </div>
+
+        <div class="results">
+          <div class="meter">
+            <div class="bar"><div class="fill" id="scoreFill"></div></div>
+            <div class="score" id="scoreText">0 / 5</div>
+          </div>
+
+          <div>
+            <div class="hint" style="margin-bottom:8px;">Word-by-word:</div>
+            <div class="chips" id="chips"></div>
+          </div>
+
+          <div class="footer-note" id="detailNote"></div>
+        </div>
+
+        <div class="row">
+          <button class="primary" id="againBtn">Try again (new words)</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      // Simple word bank (keep words short + common)
+      const WORD_BANK = [
+        "apple", "chair", "river", "paper", "clock",
+        "music", "bread", "green", "stone", "house",
+        "water", "light", "smile", "sleep", "plant",
+        "train", "pencil", "window", "shirt", "beach",
+        "candle", "garden", "orange", "pocket", "button"
+      ];
+
+      const TEST_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+
+      // UI refs
+      const wordsGrid = document.getElementById("wordsGrid");
+      const timerLabel = document.getElementById("timerLabel");
+
+      const stageMemorize = document.getElementById("stageMemorize");
+      const stageRecall = document.getElementById("stageRecall");
+      const stageResults = document.getElementById("stageResults");
+
+      const memorizeStatus = document.getElementById("memorizeStatus");
+      const recallStatus = document.getElementById("recallStatus");
+      const resultStatus = document.getElementById("resultStatus");
+
+      const startBtn = document.getElementById("startBtn");
+      const scoreBtn = document.getElementById("scoreBtn");
+      const revealBtn = document.getElementById("revealBtn");
+
+      const newWordsBtn = document.getElementById("newWordsBtn");
+      const restartBtn = document.getElementById("restartBtn");
+      const againBtn = document.getElementById("againBtn");
+
+      const recallInput = document.getElementById("recallInput");
+      const peekStatus = document.getElementById("peekStatus");
+
+      const scoreFill = document.getElementById("scoreFill");
+      const scoreText = document.getElementById("scoreText");
+      const chips = document.getElementById("chips");
+      const detailNote = document.getElementById("detailNote");
+
+      // State
+      let currentWords = [];
+      let endTime = null;
+      let tickTimer = null;
+      let startedAt = null;
+      let peeked = false;
+
+      // Helpers
+      function pickWords(n = 5) {
+        // Shuffle copy of bank and take first n
+        const copy = WORD_BANK.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy.slice(0, n);
+      }
+
+      function renderWords(words) {
+        wordsGrid.innerHTML = "";
+        words.forEach(w => {
+          const div = document.createElement("div");
+          div.className = "word";
+          div.textContent = w;
+          wordsGrid.appendChild(div);
+        });
+      }
+
+      function formatTime(msRemaining) {
+        const totalSec = Math.max(0, Math.floor(msRemaining / 1000));
+        const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
+        const ss = String(totalSec % 60).padStart(2, "0");
+        return `${mm}:${ss}`;
+      }
+
+      function setStage(which) {
+        stageMemorize.style.display = which === "memorize" ? "" : "none";
+        stageRecall.style.display    = which === "recall" ? "" : "none";
+        stageResults.style.display   = which === "results" ? "" : "none";
+      }
+
+      function resetAll({ keepWords = false } = {}) {
+        if (!keepWords) currentWords = pickWords(5);
+        renderWords(currentWords);
+
+        // Reset timer
+        endTime = null;
+        startedAt = null;
+        peeked = false;
+        peekStatus.textContent = "";
+        timerLabel.textContent = "Not started";
+
+        // Reset UI
+        memorizeStatus.innerHTML = `Press <span class="accent">Start</span> when ready.`;
+        recallInput.value = "";
+        scoreFill.style.width = "0%";
+        scoreText.textContent = "0 / 5";
+        chips.innerHTML = "";
+        detailNote.textContent = "";
+        resultStatus.textContent = "";
+
+        clearInterval(tickTimer);
+        tickTimer = null;
+
+        // Start at memorize stage
+        setStage("memorize");
+      }
+
+      function startTimer() {
+        startedAt = Date.now();
+        endTime = startedAt + TEST_DURATION_MS;
+
+        memorizeStatus.innerHTML = `Timer running. Come back in <span class="accent">10 minutes</span>.`;
+        timerLabel.textContent = formatTime(TEST_DURATION_MS);
+
+        // Update immediately + every second
+        function tick() {
+          const now = Date.now();
+          const remaining = endTime - now;
+
+          if (remaining <= 0) {
+            timerLabel.textContent = "00:00";
+            clearInterval(tickTimer);
+            tickTimer = null;
+
+            setStage("recall");
+            recallInput.focus();
+            recallStatus.innerHTML = `<span class="ok">Time’s up.</span> Enter the five words you remember.`;
+            return;
+          }
+
+          timerLabel.textContent = formatTime(remaining);
+        }
+
+        tick();
+        tickTimer = setInterval(tick, 1000);
+
+        // Move to recall screen right away (optional)
+        // But most people want to leave the words visible briefly.
+        // We'll keep memorize stage visible while timer runs.
+      }
+
+      function normalizeInput(text) {
+        // Split on commas/spaces/newlines, remove empties, lowercase
+        return text
+          .toLowerCase()
+          .replace(/[^a-z,\s]/g, " ")   // keep it simple: letters + separators
+          .split(/[\s,]+/g)
+          .map(x => x.trim())
+          .filter(Boolean);
+      }
+
+      function scoreRecall() {
+        const guesses = normalizeInput(recallInput.value);
+
+        const target = currentWords.slice();
+        const targetSet = new Set(target);
+
+        // Unique guesses only (so "apple apple apple" doesn't count 3x)
+        const uniqueGuesses = [];
+        const seen = new Set();
+        for (const g of guesses) {
+          if (!seen.has(g)) {
+            seen.add(g);
+            uniqueGuesses.push(g);
+          }
+        }
+
+        let correct = 0;
+        const perWord = target.map(w => ({
+          word: w,
+          hit: targetSet.has(w) && uniqueGuesses.includes(w),
+        }));
+
+        correct = perWord.reduce((acc, x) => acc + (x.hit ? 1 : 0), 0);
+
+        // Render results
+        setStage("results");
+
+        const pct = Math.round((correct / target.length) * 100);
+        scoreFill.style.width = pct + "%";
+        scoreText.textContent = `${correct} / ${target.length}`;
+
+        const elapsedMs = startedAt ? (Date.now() - startedAt) : null;
+        const elapsedStr = elapsedMs != null ? formatTime(elapsedMs) : null;
+
+        resultStatus.innerHTML =
+          `${correct === 5 ? '<span class="ok">Perfect recall.</span>' :
+            correct >= 3 ? '<span class="accent">Nice.</span>' :
+            correct >= 1 ? '<span class="bad">Tough one.</span>' :
+            '<span class="bad">No matches.</span>'}
+           ${peeked ? ' <span class="bad">(peeked)</span>' : ''}`;
+
+        chips.innerHTML = "";
+        perWord.forEach(x => {
+          const span = document.createElement("span");
+          span.className = "chip " + (x.hit ? "good" : "bad");
+          span.innerHTML = `<span class="dot"></span>${x.word}`;
+          chips.appendChild(span);
+        });
+
+        const guessPreview = uniqueGuesses.length
+          ? uniqueGuesses.slice(0, 12).join(", ") + (uniqueGuesses.length > 12 ? "..." : "")
+          : "(no input)";
+
+        detailNote.textContent =
+          `Your answers: ${guessPreview}` +
+          (elapsedStr ? ` • Time since start: ${elapsedStr}` : "") +
+          ` • Score: ${pct}%`;
+      }
+
+      function revealAnswers() {
+        peeked = true;
+        peekStatus.innerHTML = `<span class="bad">Revealed.</span> Answers: <span class="accent">${currentWords.join(", ")}</span>`;
+      }
+
+      // Wire up buttons
+      startBtn.addEventListener("click", () => {
+        if (endTime) return; // already running
+        startTimer();
+      });
+
+      scoreBtn.addEventListener("click", scoreRecall);
+
+      revealBtn.addEventListener("click", revealAnswers);
+
+      newWordsBtn.addEventListener("click", () => resetAll({ keepWords: false }));
+      restartBtn.addEventListener("click", () => resetAll({ keepWords: true }));
+
+      againBtn.addEventListener("click", () => resetAll({ keepWords: false }));
+
+      // Enter to score (Ctrl/Cmd+Enter)
+      recallInput.addEventListener("keydown", (e) => {
+        const isMac = navigator.platform.toLowerCase().includes("mac");
+        if ((isMac && e.metaKey && e.key === "Enter") || (!isMac && e.ctrlKey && e.key === "Enter")) {
+          scoreRecall();
+        }
+      });
+
+      // Init
+      resetAll({ keepWords: false });
+    })();
+  </script>
+</body>
+</html>
